@@ -8,6 +8,9 @@
 #include "drivers/keyboard.h"
 #include "drivers/pit.h"
 #include "memory/memory.h"
+#include <stdarg.h>
+
+void kernel_panic(const char* msg);
 
 /* Внешние символы для определения размера ядра */
 extern uint32_t _kernel_start;
@@ -70,6 +73,10 @@ void kmain(void)
         char* user_input = read_line(128);
         
         if (user_input) {
+            // Если введена команда panic, вызвать kernel_panic
+            if (user_input[0] == 'p' && user_input[1] == 'a' && user_input[2] == 'n' && user_input[3] == 'i' && user_input[4] == 'c' && user_input[5] == '\0') {
+                kernel_panic("Manual panic triggered by user input.\n");
+            }
             /* Здесь должен быть обработчик команд (временный) */
             /* В финальной версии будет переключение контекста */
             
@@ -87,4 +94,18 @@ void kmain(void)
     
     /* Ядро никогда не должно достигать этой точки */
     __builtin_unreachable();
+}
+
+/**
+ * @brief Аварийное завершение работы ядра (kernel panic)
+ * @param msg Строка с причиной паники
+ */
+void kernel_panic(const char* msg) {
+    clear_screen();
+    disable_cursor();
+    print_string_color("KERNEL PANIC!\n", COLOR_WHITE, COLOR_RED);
+    print_string_color(msg, COLOR_BLACK, COLOR_WHITE);
+    while (1) {
+        __asm__ volatile ("cli; hlt");
+    }
 }
