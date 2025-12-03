@@ -8,8 +8,9 @@ CFLAGS := -m32 -c -ffreestanding -nostdlib -Wall -Wextra -g
 LD := ld
 LDFLAGS := -m elf_i386 -T linker.ld -o kernel
 QEMU := qemu-system-i386
-QEMUFLAGS_RUN := -kernel
-QEMUFLAGS_DEBUG := -kernel kernel -s -S
+# Полные флаги для QEMU (включая режим вывода и ядро)
+QEMUFLAGS_RUN := -display curses -kernel kernel
+QEMUFLAGS_DEBUG := -display curses -kernel kernel -s -S
 GDB := gdb
 
 # Директории
@@ -42,14 +43,14 @@ all: kernel
 # Запуск в QEMU
 run: kernel
 	@echo -e "\n🚀 \033[1;36mЗапуск ядра в QEMU...\033[0m"
-	@$(QEMU) $(QEMUFLAGS_RUN) kernel
+	@$(QEMU) -kernel kernel -display curses
 
 # Отладка (QEMU + GDB)
 debug: kernel
 	@echo -e "\n🐞 \033[1;35mОтладка:\033[0m"
 	@echo -e "  1. QEMU ждёт подключения GDB на порту :1234"
 	@echo -e "  2. В новом терминале выполните: \033[1;33mgdb -x .gdbinit kernel\033[0m"
-	@$(QEMU) $(QEMUFLAGS_DEBUG) kernel
+	@$(QEMU) $(QEMUFLAGS_DEBUG)
 
 # Создание build/
 build_dir:

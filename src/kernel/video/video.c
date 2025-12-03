@@ -9,6 +9,7 @@
 
 #include "video.h"
 #include "../idt/idt.h"
+#include "../memory/memory.h"
 #include <stdint.h>
 
 /**
@@ -34,7 +35,7 @@ char* VIDEO_MEMORY = (char*)0xB8000;
  * Обновляется после каждого вывода символа.
  */
 unsigned int cursor_pos = 0;
- /**
+/**
  * @brief Безопасное обновление позиции курсора с проверкой границ
  * @param new_pos Новая позиция курсора
  */
@@ -43,6 +44,33 @@ static void safe_update_cursor_pos(int new_pos) {
     if (new_pos >= SCREEN_SIZE) new_pos = SCREEN_SIZE - 2;
     cursor_pos = new_pos;
     update_cursor(cursor_pos / 2);
+}
+
+/**
+ * @brief Прокрутка экрана на одну строку вверх.
+ *
+ * Сдвигает содержимое видеопамяти на одну текстовую строку вверх,
+ * последнюю строку заполняет пробелами и корректирует позицию курсора.
+ */
+static void scroll_screen(void) {
+    const unsigned int row_size = 80 * 2; /* 80 символов * 2 байта */
+
+    /* Сдвигаем все строки, кроме первой, на одну строку вверх */
+    memory_copy(
+        VIDEO_MEMORY,
+        VIDEO_MEMORY + row_size,
+        SCREEN_SIZE - row_size
+    );
+
+    /* Очищаем последнюю строку */
+    for (unsigned int i = SCREEN_SIZE - row_size; i < SCREEN_SIZE; i += 2) {
+        VIDEO_MEMORY[i] = ' ';
+        VIDEO_MEMORY[i + 1] = 0x07;
+    }
+
+    /* Устанавливаем курсор в начало последней строки */
+    cursor_pos = SCREEN_SIZE - row_size;
+    safe_update_cursor_pos(cursor_pos);
 }
 
 /**
@@ -130,11 +158,11 @@ void clear_screen(void)
  * @note При достижении конца экрана выполняется сброс позиции в начало
  */
 void print_string(const char* str) {
-    while (*str && cursor_pos < SCREEN_SIZE) {
+    while (*str) {
         if (*str == '\n') {
             cursor_pos = ((cursor_pos / 160) + 1) * 160;
             if (cursor_pos >= SCREEN_SIZE) {
-                cursor_pos = SCREEN_SIZE - 160;
+                scroll_screen();
             }
             str++;
             continue;
@@ -154,8 +182,7 @@ void print_string(const char* str) {
         cursor_pos += 2;
         
         if (cursor_pos >= SCREEN_SIZE) {
-            // Реализуйте скроллинг экрана здесь при необходимости
-            cursor_pos = SCREEN_SIZE - 2;
+            scroll_screen();
         }
 
         safe_update_cursor_pos(cursor_pos);
@@ -178,11 +205,11 @@ void print_string_color(const char* str, unsigned char fg_color, unsigned char b
 {
     unsigned char attribute = (bg_color << 4) | (fg_color & 0x0F);
     
-    while (*str && cursor_pos < SCREEN_SIZE) {
+    while (*str) {
         if (*str == '\n') {
             cursor_pos = ((cursor_pos / 160) + 1) * 160;
             if (cursor_pos >= SCREEN_SIZE) {
-                cursor_pos = SCREEN_SIZE - 160;
+                scroll_screen();
             }
             str++;
             continue;
@@ -193,7 +220,7 @@ void print_string_color(const char* str, unsigned char fg_color, unsigned char b
         cursor_pos += 2;
         
         if (cursor_pos >= SCREEN_SIZE) {
-            cursor_pos = SCREEN_SIZE - 2;
+            scroll_screen();
         }
     }
     safe_update_cursor_pos(cursor_pos);

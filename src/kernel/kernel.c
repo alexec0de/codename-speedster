@@ -8,6 +8,8 @@
 #include "drivers/keyboard.h"
 #include "drivers/pit.h"
 #include "memory/memory.h"
+#include "console.h"
+#include "shell.h"
 #include <stdarg.h>
 
 void kernel_panic(const char* msg);
@@ -21,8 +23,8 @@ extern uint32_t _kernel_end;
  */
 void kmain(void) 
 {
-    /* Инициализация видео-подсистемы */
-    clear_screen();
+    /* Инициализация подсистемы вывода/консоли */
+    console_init();
 
     idt_init();         // Настройка таблицы прерываний
     keyboard_init();    // Инициализация драйвера клавиатуры
@@ -37,7 +39,7 @@ void kmain(void)
     heap_init(heap_start, heap_size);
     
     /* Вывод информации о ядре */
-    const char *kernel_name = "\ncodename speedster\n";
+    const char *kernel_name = "\nlibreacronium\n";
     const char *kernel_msg = "(c) Acronium Foundation 2025\n";
     
     // Название ядра с цветовым оформлением
@@ -60,7 +62,7 @@ void kmain(void)
      */
     while(1) {
         /* Временное приглашение командной строки */
-        print_string("$ ");
+        console_prompt();
         
         /**
          * @dev Временная функция чтения ввода (только для DevTest)
@@ -70,16 +72,12 @@ void kmain(void)
          * - Буферизация будет осуществляться в пространстве пользователя
          * - Доступ к терминалу будет через стандартные дескрипторы (stdin/stdout)
          */
-        char* user_input = read_line(128);
-        
+        char* user_input = console_readline(128);
+
         if (user_input) {
-            // Если введена команда panic, вызвать kernel_panic
-            if (user_input[0] == 'p' && user_input[1] == 'a' && user_input[2] == 'n' && user_input[3] == 'i' && user_input[4] == 'c' && user_input[5] == '\0') {
-                kernel_panic("Manual panic triggered by user input.\n");
-            }
-            /* Здесь должен быть обработчик команд (временный) */
-            /* В финальной версии будет переключение контекста */
-            
+            /* Обработка команды в shell */
+            shell_execute(user_input);
+
             /* Освобождаем память, выделенную для ввода */
             kfree(user_input);
         } else {
