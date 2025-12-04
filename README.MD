@@ -42,6 +42,7 @@ sudo dnf install @development-tools nasm qemu gdb
 # Альт Линукс (Сизиф)
 su -
 apt-get install nasm qemu gdb gcc
+```
 
 ## Лицензия
 
