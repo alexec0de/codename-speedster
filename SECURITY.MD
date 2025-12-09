@@ -6,8 +6,8 @@
 
 | Version                   | Supported          |
 | ------------------------- | ------------------ |
-| 25.06.23-stable           | :white_check_mark: |
-| < 25.06-experimental 1707 | :x:                |
+| 04.12-experimental        | :x:                |
+| 09.12-stable              | :white_check_mark: |
 
 ## Сообщить об уязвимости
 

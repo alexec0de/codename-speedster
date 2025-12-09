@@ -12,13 +12,6 @@
 #include <stdint.h>
 
 /**
- * @brief Инициализация консоли.
- *
- * Очищает экран и подготавливает вывод.
- */
-void console_init(void);
-
-/**
  * @brief Вывод строки без перевода строки.
  */
 void console_print(const char *str);

@@ -7,10 +7,6 @@
 #include "video/video.h"
 #include "drivers/keyboard.h"
 
-void console_init(void) {
-    clear_screen();
-}
-
 void console_print(const char *str) {
     if (!str) {
         return;
@@ -26,7 +22,7 @@ void console_println(const char *str) {
 }
 
 void console_prompt(void) {
-    print_string("$ ");
+    print_string("$: ");
 }
 
 char* console_readline(uint32_t max_length) {

@@ -7,7 +7,7 @@
 <h3 align="center">LibreAcronium</h3>
 
 <h3 align="center">
-  <img width="800" style="border-radius:5px;" alt="screenshot" src="screenshots/25.06.23-stable.png">
+  <img width="800" style="border-radius:5px;" alt="screenshot" src="screenshots/09.12-stable.png">
 </h3>
 
 # LibreAcronium (codename speedster)

@@ -5,6 +5,7 @@
 
 #include "shell.h"
 #include "console.h"
+#include "video/video.h"
 #include "memory/memory.h"
 #include "drivers/pit.h"
 
@@ -59,7 +60,7 @@ void shell_execute(const char *cmd) {
     if (str_eq(cmd, "help")) {
         shell_print_help();
     } else if (str_eq(cmd, "clear")) {
-        console_init();
+        clear_screen();
     } else if (str_eq(cmd, "meminfo")) {
         pmm_dump_info();
     } else if (str_eq(cmd, "heapinfo")) {
