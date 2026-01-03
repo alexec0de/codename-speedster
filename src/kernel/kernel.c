@@ -40,7 +40,7 @@
      
      /* Вывод информации о ядре */
      const char *kernel_name = "\nlibreacronium\n";
-     const char *kernel_msg = "(c) Acronium Foundation 2025\n";
+     const char *kernel_msg = "(c) Acronium Foundation 2026\n";
      
      // Название ядра с цветовым оформлением
      print_string_color(kernel_name, COLOR_GREEN, COLOR_RED);
