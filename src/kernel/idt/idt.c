@@ -111,6 +111,10 @@ void idt_init(void)
     /* Настройка обработчика системного таймера (IRQ0 -> INT 0x20) */
     idt_set_gate(0x20, (unsigned long)pit_handler_asm);
 
+    /* Настройка обработчика системных вызовов (int 0x80) */
+    extern void syscall_handler_asm();
+    idt_set_gate(0x80, (unsigned long)syscall_handler_asm);
+
     /* 2. Перенастройка PIC (Programmable Interrupt Controller) */
     
     /* ICW1 - начало инициализации */
